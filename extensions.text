@@ -1,0 +1,123 @@
+                             --*--
+
+Dans la vue d'un compte, rajouter la somme des débits et la somme des
+crédits, ainsi que le sole du compte. 
+
+                             --*--
+
+Permettre la modification de la date d'une transaction et trier les
+transactions par la date. 
+
+                             --*--
+
+Dans la vue d'une transaction, afficher la somme des débits et la
+somme des crédits, ainsi que la différence entre les deux. 
+
+                             --*--
+
+Rajouter la fonctionnalité permettant la suppression d'une entrée dans
+une transaction. 
+
+                             --*--
+
+Rajouter la fonctionnalité permettant la modification d'un montant
+d'une entrée dans une transaction. 
+
+                             --*--
+
+Permettre la création d'un ensemble de comptes pouvant 
+être considéré comme un seul compte.  Un exemple de ce type d'ensemble
+serait "fournisseurs" pour regrouper tous les fournisseurs.  Créer les
+ensembles "Coût" (Télécommunication, Électricité, Nourriture, etc),
+"Revenue" (Salaire, etc),  "Actif" (Créances, Comptes bancaires, Stock
+de marchandise, etc) et "Passif" (Dettes).
+
+                             --*--
+
+Rajouter la possibilité de limiter les informations affichées à une
+période précise.  La vue d'un compte doit alors afficher à la fois la
+solde au début de la période et celui à la fin de la période. 
+
+                             --*--
+
+Rajouter la possibilité de charger plusieurs organisation
+simultanément dans le logiciel, et de pouvoir sélectionner entre ces
+organisations. 
+
+                             --*--
+
+Afin d'éviter des "constantes magiques" (comme la taille de divers
+fenêtres) dans le code, mettre ces constantes (ainsi que d'autres
+expressions arbitraires) dans un fichier ~/.compta, et modifier le
+logiciel pour que ce fichier soit chargé avant l'exécution du
+logiciel.
+
+                             --*--
+
+À la fin d'une période, créer le rapport "résultat" (la différence
+entre revenues et coûts). 
+
+                             --*--
+
+À la fin d'une période, créer le rapport "bilan" (la différence
+entre actif et passif). 
+
+                             --*--
+
+Automatiser le calcul de la TVA selon les taux en vigueur. 
+
+                             --*--
+
+Alors que certains achats peuvent être considérés comme des coût
+lorsque le payement est effectué, ce n'est pas toujours le cas.
+L'achat de mobilier ou d'équipement avec une durée de vie qui dépasse
+celle de la période de comptabilité et traité différemment.  Lorsque
+l'achat est effectué, il y a un transfert entre le compte bancaire, et
+un compte représentant l'équipement.  Cette transfert ne modifie pas
+le résultat de l'opération.  Puis chaque année (par exemple), on
+considère que l'équipement perde une partie de sa valeur (par exemple
+20% chaque année pendant 5 ans).  Ces montant sont donc transférés du
+compte pour l'équipement à un compte de coût.  Ces dernières
+transactions influence le résultat de l'opération et donc aussi
+d'autre aspects somme les impôts sur le résultat.  Automatiser la
+création de ces dernières transactions lorsque le premier transfert
+est effectué. 
+
+                             --*--
+
+Partiellement parce que les comptables n'aiment pas des montants
+négatifs, let traitement de la TVA est en réalité un peu complexe.  En
+réalité on manipule 6 compte différents : 
+
+    tva-à-daicaisser
+      Ce compte est débité à chaque fois que l'entreprise verse une
+      somme de tva aux autorités (c'est le compte bancaire qui est
+      crédité). 
+
+    tva-à-encaisser
+      Ce compte est crédité à chaque fois que l'entreprise reçois un
+      payement de TVA des autorités. 
+
+    tva-versée 
+      Ce compte est débité à chaque fois qu'un achat est effectué .
+
+    tva-collectée
+      Ce compte est crédité à chaque fois qu'une vente est effectuée. 
+
+    tva-crédits
+    tva-dettes
+      Ces deux comptes indiquent à la fin de la période combien de TVA
+      est due à la société ou par la société.  Si la société doit de
+      l'argent, alors c'est tva-dette qui est crédité, et si la
+      société a payé plus de TVA qu'elle n'a collecté, alors c'est le
+      compte tva-crédits qui est débité.  Le compte tva-crédits est un
+      compte dans le groupe "créances", et tva-dettes est un compte
+      dans le groupe "dettes".
+
+      À la fin de l'année, on émet assez de transactions pour les
+      quatre premiers compte ainsi qu'au moins l'un des deux derniers
+      aient un solde de 0.  
+
+Automatiser la génération de ces transactions grâce à une commande
+"balance-vat". 
+
