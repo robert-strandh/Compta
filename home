@@ -1,0 +1,95 @@
+ComptaV1
+
+[COMPTA-MODEL:ORGANIZATION
+   :NAME "Home"
+   :ACCOUNTS (#1=[COMPTA-MODEL:ACCOUNT :NAME "TVA" ]
+              #2=[COMPTA-MODEL:ACCOUNT :NAME "SFR" ]
+              #3=[COMPTA-MODEL:ACCOUNT :NAME "Orange" ]
+              #4=[COMPTA-MODEL:ACCOUNT :NAME "Telecommunications" ]
+              #5=[COMPTA-MODEL:ACCOUNT :NAME "Salaire Universite" ]
+              #6=[COMPTA-MODEL:ACCOUNT :NAME "Salaire IBM" ]
+              #7=[COMPTA-MODEL:ACCOUNT :NAME "Compte courant BNP" ])
+   :TRANSACTIONS ([COMPTA-MODEL:TRANSACTION
+                     :NAME "Facture Orange Payee"
+                     :DATE [COMPTA-MODEL:DATE
+                              :YEAR 2009
+                              :MONTH 11
+                              :DAY 29
+                              :HOUR 14
+                              :MINUTE 4 ]
+                     :CREATOR #8="Spiaggia"
+                     :DEBITS ([COMPTA-MODEL:ENTRY :ACCOUNT #3# :AMOUNT 3967 ])
+                     :CREDITS ([COMPTA-MODEL:ENTRY
+                                  :ACCOUNT #7#
+                                  :AMOUNT 3967 ]) ]
+                  [COMPTA-MODEL:TRANSACTION
+                     :NAME "Salaire Jill"
+                     :DATE [COMPTA-MODEL:DATE
+                              :YEAR 2009
+                              :MONTH 11
+                              :DAY 29
+                              :HOUR 14
+                              :MINUTE 1 ]
+                     :CREATOR #8#
+                     :DEBITS ([COMPTA-MODEL:ENTRY
+                                 :ACCOUNT #7#
+                                 :AMOUNT 345678 ])
+                     :CREDITS ([COMPTA-MODEL:ENTRY
+                                  :ACCOUNT #6#
+                                  :AMOUNT 345678 ]) ]
+                  [COMPTA-MODEL:TRANSACTION
+                     :NAME "Facture SFR Payee"
+                     :DATE [COMPTA-MODEL:DATE
+                              :YEAR 2009
+                              :MONTH 11
+                              :DAY 29
+                              :HOUR 13
+                              :MINUTE 59 ]
+                     :CREATOR #8#
+                     :DEBITS ([COMPTA-MODEL:ENTRY :ACCOUNT #2# :AMOUNT 9714 ])
+                     :CREDITS ([COMPTA-MODEL:ENTRY
+                                  :ACCOUNT #7#
+                                  :AMOUNT 9714 ]) ]
+                  [COMPTA-MODEL:TRANSACTION
+                     :NAME "Facture SFR"
+                     :DATE [COMPTA-MODEL:DATE
+                              :YEAR 2009
+                              :MONTH 11
+                              :DAY 29
+                              :HOUR 13
+                              :MINUTE 57 ]
+                     :CREATOR #8#
+                     :DEBITS ([COMPTA-MODEL:ENTRY :ACCOUNT #1# :AMOUNT 1542 ]
+                              [COMPTA-MODEL:ENTRY :ACCOUNT #4# :AMOUNT 8172 ])
+                     :CREDITS ([COMPTA-MODEL:ENTRY
+                                  :ACCOUNT #2#
+                                  :AMOUNT 9714 ]) ]
+                  [COMPTA-MODEL:TRANSACTION
+                     :NAME "Facture Orange"
+                     :DATE [COMPTA-MODEL:DATE
+                              :YEAR 2009
+                              :MONTH 11
+                              :DAY 29
+                              :HOUR 13
+                              :MINUTE 55 ]
+                     :CREATOR #8#
+                     :DEBITS ([COMPTA-MODEL:ENTRY :ACCOUNT #1# :AMOUNT 600 ]
+                              [COMPTA-MODEL:ENTRY :ACCOUNT #4# :AMOUNT 3367 ])
+                     :CREDITS ([COMPTA-MODEL:ENTRY
+                                  :ACCOUNT #3#
+                                  :AMOUNT 3967 ]) ]
+                  [COMPTA-MODEL:TRANSACTION
+                     :NAME "Salaire Jaques"
+                     :DATE [COMPTA-MODEL:DATE
+                              :YEAR 2009
+                              :MONTH 11
+                              :DAY 29
+                              :HOUR 13
+                              :MINUTE 53 ]
+                     :CREATOR #8#
+                     :DEBITS ([COMPTA-MODEL:ENTRY
+                                 :ACCOUNT #7#
+                                 :AMOUNT 234567 ])
+                     :CREDITS ([COMPTA-MODEL:ENTRY
+                                  :ACCOUNT #5#
+                                  :AMOUNT 234567 ]) ]) ]
