@@ -6,14 +6,14 @@
 (defclass account (name-mixin)
   ())
 
-(defmacro make-time-function (name accessor)
-  `(defun ,name () (,accessor (multiple-value-list (get-decoded-time)))))
+(defmacro make-time-function (name n)
+  `(defun ,name () (nth-value ,n (get-decoded-time))))
 
-(make-time-function current-year sixth)
-(make-time-function current-month fifth)
-(make-time-function current-day fourth)
-(make-time-function current-hour third)
-(make-time-function current-minute second)
+(make-time-function current-year 5)
+(make-time-function current-month 4)
+(make-time-function current-day 3)
+(make-time-function current-hour 2)
+(make-time-function current-minute 1)
 
 (defclass date ()
   ((%year :initarg :year :initform (current-year) :reader year)
