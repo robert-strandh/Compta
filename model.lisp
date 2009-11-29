@@ -20,7 +20,7 @@
    (%month :initarg :month :initform (current-month) :reader month)
    (%day :initarg :day :initform (current-day) :reader day)
    (%hour :initarg :hour :initform (current-hour) :reader hour)
-   (%minute :initarg :minute :initform (current-minute) :reader miniute)))
+   (%minute :initarg :minute :initform (current-minute) :reader minute)))
 
 (defun iso-date-string (date)
   (format nil "~4,'0d-~2,'0d-~2,'0d ~2,'0d:~2,'0d"

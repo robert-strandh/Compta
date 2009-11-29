@@ -1,10 +1,10 @@
 (in-package #:compta-gui)
 
 (define-application-frame compta ()
-  ((%current-organization :initform (make-instance 'organization)
+  ((%current-organization :initform (make-instance 'organization :name "Home")
                           :accessor current-organization))
   (:panes (main :application
-		:width 500
+		:width 800
 		:height 500
                 :display-function 'display-main)
 	  (accounts :application
@@ -12,7 +12,7 @@
                     :height 650
                     :display-function 'display-accounts)
           (transactions :application
-                        :width 200
+                        :width 300
                         :height 650
                         :display-function 'display-transactions)
 	  (inter :interactor
@@ -21,8 +21,8 @@
   (:layouts (default
                 (horizontally ()
                   (vertically () main inter)
-                  accounts
-                  transactions))))
+                  transactions
+                  accounts))))
 
 (defclass account-view (view)
   ((%account :initarg :account :reader account)))
@@ -38,36 +38,91 @@
 
 (defmethod display-main-with-view (frame pane (view account-view))
   (declare (ignore frame))
-  (format pane "Account: ~a" (name (account view))))
+  (format pane "Account: ~a~%~%" (name (account view)))
+  (loop with account = (account view)
+        with organization = (current-organization *application-frame*)
+        with medium = (sheet-medium pane)
+        for transaction in (reverse (transactions organization))
+        do (let ((entry (find account (debits transaction) :key #'account)))
+             (unless (null entry)
+               (with-output-as-presentation (pane transaction 'transaction)
+                 (format pane "~a" (iso-date-string (date transaction)))
+                 (with-text-family (medium :fixed)
+                   (multiple-value-bind (euros cents) (floor (amount entry) 100)
+                     (format pane "~10d.~2,'0d~50t" euros cents)))
+                 (format pane "~a~%" (name transaction)))))
+        do (let ((entry (find account (credits transaction) :key #'account)))
+             (unless (null entry)
+               (with-output-as-presentation (pane transaction 'transaction)
+                 (format pane "~a" (iso-date-string (date transaction)))
+                 (with-text-family (medium :fixed)
+                   (multiple-value-bind (euros cents) (floor (amount entry) 100)
+                     (format pane "~30d.~2,'0d~50t" euros cents)))
+                 (format pane "~a~%" (name transaction)))))))
+
+(define-presentation-type amount () :inherit-from 'integer)
+
+(defclass entry-adder ()
+  ((%adder :initarg :adder :reader adder)))
+
+(defclass name-changer ()
+  ((%object :initarg :object :reader object)))
 
 (defmethod display-main-with-view (frame pane (view transaction-view))
   (declare (ignore frame))
-  (let ((transaction (transaction view)))
-    (format pane "Transaction: ~a Date: ~a Created by: ~a~%"
-            (name transaction)
-            (iso-date-string (date transaction))
-            (name (creator transaction)))
-    (format pane "Debited accounts:~%")
-    (loop for account in (debits transaction)
-          do (format pane "     ~a~%" account))
-    (format pane "Credited accounts:~%")
-    (loop for account in (credits transaction)
-          do (format pane "     ~a~%" account))))
+  (let ((transaction (transaction view))
+        (medium (sheet-medium pane)))
+    (flet ((show-entry (entry)
+             (with-text-family (medium :fixed)
+               (with-output-as-presentation (pane (amount entry) 'amount)
+                 (multiple-value-bind (euros cents) (floor (amount entry) 100)
+                   (format pane "~10d.~2,'0d        " euros cents))))
+             (with-output-as-presentation (pane (account entry) 'account)
+               (format pane "~a~%" (name (account entry))))))
+      (format pane "Transaction name: ")
+      (with-output-as-presentation (pane
+                                    (make-instance 'name-changer
+                                                   :object transaction)
+                                    'name-changer)
+        (format pane "~a~%" (name transaction)))
+
+      (format pane "Date: ~a~%Created by: ~a~%~%~%"
+              (iso-date-string (date transaction))
+              (creator transaction))
+      (format pane "Debits: ")
+      (let ((adder (make-instance 'entry-adder
+                                  :adder (lambda (entry)
+                                           (push entry
+                                                 (debits transaction))))))
+        (with-output-as-presentation (pane adder 'entry-adder)
+          (format pane "[add]~%")))
+      (loop for entry in (reverse (debits transaction))
+            do (show-entry entry))
+      (format pane "Credits: ")
+      (let ((adder (make-instance 'entry-adder
+                                  :adder (lambda (entry)
+                                           (push entry (credits transaction))))))
+        (with-output-as-presentation (pane adder 'entry-adder)
+          (format pane "[add]~%")))
+      (loop for entry in (reverse (credits transaction))
+            do (show-entry entry)))))
 
 (defun display-main (frame pane)
   (display-main-with-view frame pane (stream-default-view pane)))
 
 (defun display-accounts (frame pane)
   (format pane "Accounts~%~%")
-  (loop for account in (accounts (current-organization frame))
-        do (format pane "~a~%" (name account))))
+  (loop for account in (reverse (accounts (current-organization frame)))
+        do (with-output-as-presentation (pane account 'account)
+             (format pane "~a~%" (name account)))))
 
 (defun display-transactions (frame pane)
   (format pane "Transactions~%~%")
-  (loop for transaction in (transactions (current-organization frame))
-        do (format pane "~a ~a~%"
-                   (name transaction)
-                   (iso-date-string (date transaction)))))
+  (loop for transaction in (reverse (transactions (current-organization frame)))
+        do (with-output-as-presentation (pane transaction 'transaction)
+             (format pane "~a ~a~%"
+                     (iso-date-string (date transaction))
+                     (name transaction)))))
 
 (defun compta ()
   (run-frame-top-level (make-application-frame 'compta)))
@@ -79,3 +134,61 @@
   (push (make-instance 'account :name name)
         (accounts (current-organization *application-frame*))))
 
+(define-compta-command (com-write-organization :name t) ((filename 'string))
+  (write-organization filename (current-organization *application-frame*)))
+
+(define-compta-command (com-read-organization :name t) ((filename 'pathname))
+  (setf (current-organization *application-frame*)
+        (read-organization filename)))
+
+(define-compta-command (com-new-transaction :name t) ()
+  (let ((transaction (make-instance 'transaction :name "unnamed")))
+    (push transaction (transactions (current-organization *application-frame*)))
+    (setf (stream-default-view (find-pane-named *application-frame* 'main))
+          (make-instance 'transaction-view :transaction transaction))))
+
+(define-compta-command (com-change-current-transaction-name :name t)
+    ((name 'string))
+  (let ((view (stream-default-view (find-pane-named *application-frame* 'main))))
+    (setf (name (transaction view)) name)))
+
+(define-compta-command (com-edit-account :name t)
+    ((account 'account :gesture :select))
+  (setf (stream-default-view (find-pane-named *application-frame* 'main))
+        (make-instance 'account-view :account account)))
+
+(define-compta-command (com-edit-transaction :name t)
+    ((transaction 'transaction :gesture :select))
+  (setf (stream-default-view (find-pane-named *application-frame* 'main))
+        (make-instance 'transaction-view :transaction transaction)))
+
+(define-compta-command (com-delete-account :name t)
+    ((account 'account :gesture :delete))
+  (let ((organization (current-organization *application-frame*)))
+    (setf (accounts organization)
+          (remove account (accounts organization)))))
+
+(define-compta-command (com-delete-transaction :name t) ((transaction 'transaction))
+  (let ((organization (current-organization *application-frame*)))
+    (setf (transactions organization)
+          (remove transaction (transactions organization)))))
+
+(define-presentation-method present (object (type account)
+					    stream (view textual-view) &key)
+  (format stream "~a" (name object)))
+
+(define-presentation-method present (object (type transaction)
+					    stream (view textual-view) &key)
+  (format stream "~a" (name object)))
+
+(define-compta-command (com-add-entry :name t)
+    ((adder 'entry-adder :gesture :select))
+  (funcall (adder adder) 
+           (make-instance 'entry
+                          :account (accept 'account)
+                          :amount (accept 'amount))))
+
+(define-compta-command (com-change-name :name t)
+    ((changer 'name-changer :gesture :select))
+  (setf (name (object changer))
+        (accept 'string)))
