@@ -89,7 +89,7 @@ Partiellement parce que les comptables n'aiment pas des montants
 négatifs, let traitement de la TVA est en réalité un peu complexe.  En
 réalité on manipule 6 compte différents : 
 
-    tva-à-daicaisser
+    tva-à-décaisser
       Ce compte est débité à chaque fois que l'entreprise verse une
       somme de tva aux autorités (c'est le compte bancaire qui est
       crédité). 
