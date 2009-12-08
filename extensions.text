@@ -35,12 +35,12 @@ de marchandise, etc) et "Passif" (Dettes).
                              --*--
 
 Rajouter la possibilité de limiter les informations affichées à une
-période précise.  La vue d'un compte doit alors afficher à la fois la
+période précise.  La vue d'un compte doit alors afficher à la fois le
 solde au début de la période et celui à la fin de la période. 
 
                              --*--
 
-Rajouter la possibilité de charger plusieurs organisation
+Rajouter la possibilité de charger plusieurs organisations
 simultanément dans le logiciel, et de pouvoir sélectionner entre ces
 organisations. 
 
@@ -68,26 +68,26 @@ Automatiser le calcul de la TVA selon les taux en vigueur.
 
                              --*--
 
-Alors que certains achats peuvent être considérés comme des coût
+Alors que certains achats peuvent être considérés comme des coûts
 lorsque le payement est effectué, ce n'est pas toujours le cas.
 L'achat de mobilier ou d'équipement avec une durée de vie qui dépasse
 celle de la période de comptabilité et traité différemment.  Lorsque
 l'achat est effectué, il y a un transfert entre le compte bancaire, et
-un compte représentant l'équipement.  Cette transfert ne modifie pas
-le résultat de l'opération.  Puis chaque année (par exemple), on
-considère que l'équipement perde une partie de sa valeur (par exemple
-20% chaque année pendant 5 ans).  Ces montant sont donc transférés du
+un compte représentant l'équipement.  Cet transfert ne modifie pas le
+résultat de l'opération.  Puis chaque année (par exemple), on
+considère que l'équipement perd une partie de sa valeur (par exemple
+20% chaque année pendant 5 ans).  Ces montants sont donc transférés du
 compte pour l'équipement à un compte de coût.  Ces dernières
-transactions influence le résultat de l'opération et donc aussi
-d'autre aspects somme les impôts sur le résultat.  Automatiser la
+transactions influencent le résultat de l'opération et donc aussi
+d'autre aspects comme les impôts sur le résultat.  Automatiser la
 création de ces dernières transactions lorsque le premier transfert
-est effectué. 
+est effectué.
 
                              --*--
 
 Partiellement parce que les comptables n'aiment pas des montants
-négatifs, let traitement de la TVA est en réalité un peu complexe.  En
-réalité on manipule 6 compte différents : 
+négatifs, le traitement de la TVA est en réalité un peu complexe.  En
+réalité on manipule 6 comptes différents :
 
     tva-à-décaisser
       Ce compte est débité à chaque fois que l'entreprise verse une
@@ -120,4 +120,16 @@ réalité on manipule 6 compte différents :
 
 Automatiser la génération de ces transactions grâce à une commande
 "balance-vat". 
+
+                             --*--
+
+Permettre la manipulation du logiciel entièrement au clavier
+(sélection de comptes, enregistrement de transactions...).
+
+                             --*--
+
+Simplifier l'enregistrement de nouvelles transactions en demandant au
+préalable à l'utilisateur le type de transaction à créer. En fonction
+de la réponse, le choix des comptes à impacter en débit et crédit
+pourra être réduit.
 
