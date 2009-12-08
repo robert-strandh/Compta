@@ -46,11 +46,11 @@ organisations.
 
                              --*--
 
-Afin d'éviter des "constantes magiques" (comme la taille de divers
+Afin d'éviter des "constantes magiques" (comme la taille des diverses
 fenêtres) dans le code, mettre ces constantes (ainsi que d'autres
-expressions arbitraires) dans un fichier ~/.compta, et modifier le
-logiciel pour que ce fichier soit chargé avant l'exécution du
-logiciel.
+expressions arbitraires Common Lisp) dans un fichier ~/.compta, et
+modifier le logiciel pour que ce fichier soit chargé avant l'exécution
+du logiciel.
 
                              --*--
 
@@ -133,3 +133,26 @@ préalable à l'utilisateur le type de transaction à créer. En fonction
 de la réponse, le choix des comptes à impacter en débit et crédit
 pourra être réduit.
 
+                             --*--
+
+Permettre le changement de taille des différentes fenêtres.
+
+                             --*--
+
+Éviter que le logiciel ne plante en informant proprement l'utilisateur
+de la cause du problème.
+
+                             --*--
+
+Faire des vérifications avant de valider la création d'une nouvelle
+transaction et écrire les tests unitaires associés :
+
+- un même compte ne doit pas apparaître 2 fois
+- somme des débit = somme des crédits
+
+
+%%% Local Variables: 
+%%% mode: text
+%%% coding: utf-8
+%%% ispell-local-dictionary: "french"
+%%% End:
