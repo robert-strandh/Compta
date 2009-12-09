@@ -135,11 +135,11 @@
         (accounts (current-organization *application-frame*))))
 
 (define-compta-command (com-write-organization :name t) ((filename 'string))
-  (write-organization filename (current-organization *application-frame*)))
+  (write-model filename (current-organization *application-frame*)))
 
 (define-compta-command (com-read-organization :name t) ((filename 'pathname))
   (setf (current-organization *application-frame*)
-        (read-organization filename)))
+        (read-model filename)))
 
 (define-compta-command (com-new-transaction :name t) ()
   (let ((transaction (make-instance 'transaction :name "unnamed")))

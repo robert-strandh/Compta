@@ -1,5 +1,5 @@
 (defpackage #:compta-model
-    (:use #:common-lisp)
+  (:use #:common-lisp)
   (:export #:organization
            #:name
            #:accounts #:transactions
@@ -13,13 +13,17 @@
            #:amount
            #:*operator*))
 
-(defpackage #:compta-io
-    (:use #:common-lisp #:compta-model)
+(defpackage #:io
+  (:use #:common-lisp)
   (:export #:*print-for-file-io*
-           #:read-organization
-           #:write-organization))
+	   #:define-save-info
+           #:read-model
+           #:write-model))
+
+(defpackage #:compta-io
+  (:use #:common-lisp #:compta-model #:io))
 
 (defpackage #:compta-gui
-    (:use #:clim-lisp #:clim #:compta-model #:compta-io)
+  (:use #:clim-lisp #:clim #:compta-model #:io)
   (:export #:compta))
 

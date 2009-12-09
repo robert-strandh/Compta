@@ -1,17 +1,17 @@
-(in-package :compta-io)
+(in-package :io)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; Reader programming
 
-(defparameter *compta-readtable-v1* (copy-readtable))
+(defparameter *io-readtable-v1* (copy-readtable))
 
-(defun read-compta-object-v1 (stream char)
+(defun read-model-object-v1 (stream char)
   (declare (ignore char))
   (apply #'make-instance (read-delimited-list #\] stream t)))
 
-(set-macro-character #\[ #'read-compta-object-v1 nil *compta-readtable-v1*)
-(set-syntax-from-char #\] #\) *compta-readtable-v1*)
+(set-macro-character #\[ #'read-model-object-v1 nil *io-readtable-v1*)
+(set-syntax-from-char #\] #\) *io-readtable-v1*)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -20,12 +20,12 @@
 (defgeneric save-info (object)
   (:method-combination append :most-specific-last))
 
-(defclass compta-object () ())
+(defclass model-object () ())
 
 ;;; should really use *print-readably*
 (defparameter *print-for-file-io* nil)
 
-(defun print-compta-object (obj stream)
+(defun print-model-object (obj stream)
   (pprint-logical-block (stream nil :prefix "[" :suffix "]")
     (format stream "~s ~2i" (class-name (class-of obj)))
     (loop for info in (save-info obj)
@@ -39,7 +39,7 @@
 
      (defmethod print-object ((obj ,type) stream)
        (if *print-for-file-io*
-           (print-compta-object obj stream)
+           (print-model-object obj stream)
            (call-next-method)))
 
      (defmethod save-info append ((obj ,type))
@@ -47,47 +47,26 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; Save information for various model classes
-
-(define-save-info organization
-  (:name name) (:accounts accounts) (:transactions transactions))
-
-(define-save-info date
-  (:year year) (:month month) (:day day)
-  (:hour hour) (:minute minute))
-
-(define-save-info account
-  (:name name))
-
-(define-save-info entry
-  (:account account) (:amount amount))
-
-(define-save-info transaction
-  (:name name) (:date date) (:creator creator)
-  (:debits debits) (:credits credits))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
 ;;; I/O
 
-(define-condition compta-condition (error) ())
+(define-condition model-condition (error) ())
 
-(define-condition file-does-not-exist (compta-condition) ()
+(define-condition file-does-not-exist (model-condition) ()
   (:report
    (lambda (condition stream)
      (declare (ignore condition))
      (format stream "File does not exist"))))
 
-(define-condition unknown-file-version (compta-condition) ()
+(define-condition unknown-file-version (model-condition) ()
   (:report
    (lambda (condition stream)
      (declare (ignore condition))
      (format stream "Unknown file version"))))
 
 (defparameter *readtables*
-  `(("ComptaV1" . ,*compta-readtable-v1*)))
+  `(("ComptaV1" . ,*io-readtable-v1*)))
 
-(defun read-organization (filename)
+(defun read-model (filename)
   (assert (probe-file filename) () 'file-does-not-exist)
   (with-open-file (stream filename :direction :input)
     (let* ((version (read-line stream))
@@ -97,7 +76,7 @@
             (*readtable* readtable))
         (read stream)))))
 
-(defun write-organization (filename organization)
+(defun write-model (filename object)
   (with-open-file (stream filename
                           :direction :output
                           :if-exists :supersede
@@ -105,8 +84,8 @@
     (let ((*print-circle* t)
           (*print-for-file-io* t)
           (*package* (find-package :keyword)))
-      (format stream "ComptaV1~%")
-      (pprint organization stream)
+      (format stream "IOV1~%")
+      (pprint object stream)
       (terpri stream)
       (finish-output stream))))
 
