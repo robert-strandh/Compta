@@ -150,7 +150,23 @@ transaction et écrire les tests unitaires associés :
 - un même compte ne doit pas apparaître 2 fois
 - somme des débit = somme des crédits
 
+                             --*--
 
+Faire du fichier "io.lisp" un projet Common Lisp à part entière, qui
+peut s'installer avec asdf-install depuis Internet. Écrire aussi une
+petite documentation pour accompagner ce projet.
+
+                             --*--
+
+Ajouter la possibilité d'avoir des graphiques. Par exemple, on veut
+pouvoir savoir comment sont réparties les dépenses mensuelles entre
+les différents comptes (alimentation, abonnements...).
+
+                             --*--
+
+Ajouter la planification de transaction automatique : les factures et
+les salaires mensuels par exemple.
+ 
 %%% Local Variables: 
 %%% mode: text
 %%% coding: utf-8
