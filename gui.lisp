@@ -19,10 +19,11 @@
 		 :width 500
 		 :height 100))
   (:layouts (default
-	      (horizontally ()
-			    (vertically () main inter)
-			    transactions
-			    accounts))))
+	      (horizontally
+	       ()
+	       (vertically () main inter)
+	       transactions
+	       accounts))))
 
 (defclass account-view (view)
   ((%account :initarg :account :reader account)))
@@ -49,6 +50,12 @@
 			  (find account (credits transaction) :key #'account)
 			  "~30d.~2,'0d~50t")))
 
+(defun format-amount (pane amount format)
+  (multiple-value-bind
+      (euros cents)
+      (floor amount 100)
+    (format pane format euros cents)))
+
 (defun display-entry (pane view transaction entry amount-format)
   (let ((medium (account view)))
     (unless (null entry)
@@ -57,8 +64,7 @@
        (format pane "~a" (iso-date-string (date transaction)))
        (with-text-family
 	(medium :fixed)
-	(multiple-value-bind (euros cents) (floor (amount entry) 100)
-	  (format pane amount-format euros cents)))
+	(format-amount pane (amount entry) amount-format))
        (format pane "~a~%" (name transaction))))))
 
 (define-presentation-type amount () :inherit-from 'integer)
@@ -74,10 +80,10 @@
   (let ((transaction (transaction view))
         (medium (sheet-medium pane)))
     (flet ((show-entry (entry)
-		       (with-text-family (medium :fixed)
-					 (with-output-as-presentation (pane (amount entry) 'amount)
-								      (multiple-value-bind (euros cents) (floor (amount entry) 100)
-									(format pane "~10d.~2,'0d        " euros cents))))
+		       (with-text-family
+			(medium :fixed)
+			(with-output-as-presentation (pane (amount entry) 'amount)
+						     (format-amount pane (amount entry) "~10d.~2,'0d        ")))
 		       (with-output-as-presentation (pane (account entry) 'account)
 						    (format pane "~a~%" (name (account entry))))))
       (format pane "Transaction name: ")
