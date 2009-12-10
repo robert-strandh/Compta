@@ -41,19 +41,19 @@
   (format pane "Account: ~a~%~%" (name (account view)))
   (loop with account = (account view)
         with organization = (current-organization *application-frame*)
-        with medium = (sheet-medium pane)
         for transaction in (reverse (transactions organization))
-	do (display-entry frame pane view account transaction medium (find account (debits transaction) :key #'account) "~10d.~2,'0d~50t")
-	do (display-entry frame pane view account transaction medium (find account (credits transaction) :key #'account) "~30d.~2,'0d~50t")))
+	do (display-entry frame pane view transaction  (find account (debits transaction) :key #'account) "~10d.~2,'0d~50t")
+	do (display-entry frame pane view transaction  (find account (credits transaction) :key #'account) "~30d.~2,'0d~50t")))
 
-(defun display-entry (frame pane view account transaction medium entry amount-format)
-  (unless (null entry)
+(defun display-entry (frame pane view transaction entry amount-format)
+  (let ((medium (account view)))
+    (unless (null entry)
     (with-output-as-presentation (pane transaction 'transaction)
 				 (format pane "~a" (iso-date-string (date transaction)))
 				 (with-text-family (medium :fixed)
 						   (multiple-value-bind (euros cents) (floor (amount entry) 100)
 						     (format pane amount-format euros cents)))
-				 (format pane "~a~%" (name transaction)))))
+				 (format pane "~a~%" (name transaction))))))
 
 (define-presentation-type amount () :inherit-from 'integer)
 
@@ -135,6 +135,10 @@
 (define-compta-command (com-read-organization :name t) ((filename 'pathname))
   (setf (current-organization *application-frame*)
         (read-model filename)))
+
+(define-compta-command (com-read-organization-default :name t) ()
+  (setf (current-organization *application-frame*)
+        (read-model "home")))
 
 (define-compta-command (com-new-transaction :name t) ()
   (let ((transaction (make-instance 'transaction :name "unnamed")))
