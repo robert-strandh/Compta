@@ -42,18 +42,24 @@
   (loop with account = (account view)
         with organization = (current-organization *application-frame*)
         for transaction in (reverse (transactions organization))
-	do (display-entry frame pane view transaction  (find account (debits transaction) :key #'account) "~10d.~2,'0d~50t")
-	do (display-entry frame pane view transaction  (find account (credits transaction) :key #'account) "~30d.~2,'0d~50t")))
+	do (display-entry pane view transaction
+			  (find account (debits transaction) :key #'account)
+			  "~10d.~2,'0d~50t")
+	do (display-entry pane view transaction
+			  (find account (credits transaction) :key #'account)
+			  "~30d.~2,'0d~50t")))
 
-(defun display-entry (frame pane view transaction entry amount-format)
+(defun display-entry (pane view transaction entry amount-format)
   (let ((medium (account view)))
     (unless (null entry)
-    (with-output-as-presentation (pane transaction 'transaction)
-				 (format pane "~a" (iso-date-string (date transaction)))
-				 (with-text-family (medium :fixed)
-						   (multiple-value-bind (euros cents) (floor (amount entry) 100)
-						     (format pane amount-format euros cents)))
-				 (format pane "~a~%" (name transaction))))))
+      (with-output-as-presentation
+       (pane transaction 'transaction)
+       (format pane "~a" (iso-date-string (date transaction)))
+       (with-text-family
+	(medium :fixed)
+	(multiple-value-bind (euros cents) (floor (amount entry) 100)
+	  (format pane amount-format euros cents)))
+       (format pane "~a~%" (name transaction))))))
 
 (define-presentation-type amount () :inherit-from 'integer)
 
