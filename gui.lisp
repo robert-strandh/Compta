@@ -75,6 +75,15 @@
 (defclass name-changer ()
   ((%object :initarg :object :reader object)))
 
+(defun present-adder (pane show-entry area-name push-entry entries)
+  (format pane "~a: " area-name)
+  (let ((adder (make-instance 'entry-adder
+			      :adder push-entry)))
+    (with-output-as-presentation (pane adder 'entry-adder)
+				 (format pane "[add]~%")))
+  (loop for entry in (reverse entries)
+	do (funcall show-entry entry)))
+
 (defmethod display-main-with-view (frame pane (view transaction-view))
   (declare (ignore frame))
   (let ((transaction (transaction view))
@@ -92,27 +101,11 @@
                                                    :object transaction)
                                     'name-changer)
 				   (format pane "~a~%" (name transaction)))
-
       (format pane "Date: ~a~%Created by: ~a~%~%~%"
               (iso-date-string (date transaction))
               (creator transaction))
-      (format pane "Debits: ")
-      (let ((adder (make-instance 'entry-adder
-                                  :adder (lambda (entry)
-                                           (push entry
-                                                 (debits transaction))))))
-        (with-output-as-presentation (pane adder 'entry-adder)
-				     (format pane "[add]~%")))
-      (loop for entry in (reverse (debits transaction))
-            do (show-entry entry))
-      (format pane "Credits: ")
-      (let ((adder (make-instance 'entry-adder
-                                  :adder (lambda (entry)
-                                           (push entry (credits transaction))))))
-        (with-output-as-presentation (pane adder 'entry-adder)
-				     (format pane "[add]~%")))
-      (loop for entry in (reverse (credits transaction))
-            do (show-entry entry)))))
+      (present-adder pane #'show-entry "Debits"  (lambda (entry) (push entry (debits transaction))) (debits transaction))
+      (present-adder pane #'show-entry "Credits" (lambda (entry) (push entry (credits transaction))) (credits transaction)))))
 
 (defun display-main (frame pane)
   (display-main-with-view frame pane (stream-default-view pane)))
