@@ -31,6 +31,20 @@
 (defclass transaction-view (view)
   ((%transaction :initarg :transaction :reader transaction)))
 
+(defun display-oneline-transaction-summary (pane transaction modifiablep)
+  (format pane "~a " (iso-date-string (date transaction)))  
+  (let ((object (if modifiablep
+		    (make-instance 'name-changer :object transaction)
+		    transaction))
+	(type (if modifiablep 'name-changer 'transaction))) 
+    (with-output-as-presentation (pane object type)
+      (format pane "~a~%"
+	      (name transaction)))))
+
+(defun display-oneline-account-summary (pane account)
+  (with-output-as-presentation (pane account 'account)
+    (format pane "~a~%" (name account))))
+
 (defgeneric display-main-with-view (frame pane view))
 
 (defmethod display-main-with-view (frame pane view)
@@ -56,20 +70,20 @@
 
 (defmethod display-main-with-view (frame pane (view account-view))
   (declare (ignore frame))
-  (format pane "Account: ~a~%~%" (name (account view)))
-  (loop with account = (account view)
-        with organization = (current-organization *application-frame*)
-        for transaction in (reverse (transactions organization))
-	do (display-entry
-		   pane
-		   transaction
-		   (find account (debits transaction) :key #'account)
-		   "~10d.~2,'0d~50t")
-	do (display-entry
-		   pane
-		   transaction
-		   (find account (credits transaction) :key #'account)
-		   "~30d.~2,'0d~50t")))
+  (let ((account (account view)))  
+    (display-oneline-account-summary pane account)
+    (format pane "~%")    
+    (loop for transaction in (reverse (transactions (current-organization *application-frame*)))
+	  do (display-entry
+		     pane
+		     transaction
+		     (find account (debits transaction) :key #'account)
+		     "~10d.~2,'0d~50t")
+	  do (display-entry
+		     pane
+		     transaction
+		     (find account (credits transaction) :key #'account)
+		     "~30d.~2,'0d~50t"))))
 
 (define-presentation-type amount () :inherit-from 'integer)
 
@@ -99,15 +113,8 @@
 (defmethod display-main-with-view (frame pane (view transaction-view))
   (declare (ignore frame))
   (let ((transaction (transaction view)))
-    (format pane "Transaction name: ")
-    (with-output-as-presentation (pane
-				  (make-instance 'name-changer
-						 :object transaction)
-				  'name-changer)
-      (format pane "~a~%" (name transaction)))
-    (format pane "Date: ~a~%Created by: ~a~%~%~%"
-	    (iso-date-string (date transaction))
-	    (creator transaction))
+    (display-oneline-transaction-summary pane transaction t)    
+    (format pane "Created by: ~a~%~%~%" (creator transaction))
     (display-entry-adder pane "Debits"
 			 (lambda (entry) (push entry (debits transaction))) (debits transaction))
     (display-entry-adder pane "Credits"
@@ -116,25 +123,15 @@
 (defun display-main (frame pane)
   (display-main-with-view frame pane (stream-default-view pane)))
 
-(defun display-oneline-account-summary (pane account)
-  (with-output-as-presentation (pane account 'account)
-    (format pane "~a~%" (name account))))
-
 (defun display-accounts (frame pane)
   (format pane "Accounts~%~%")
   (loop for account in (reverse (accounts (current-organization frame)))
         do (display-oneline-account-summary pane account)))
 
-(defun display-oneline-transaction-summary (pane transaction)
-  (with-output-as-presentation (pane transaction 'transaction)
-    (format pane "~a ~a~%"
-	    (iso-date-string (date transaction))
-	    (name transaction))))
-
 (defun display-transactions (frame pane)
   (format pane "Transactions~%~%")
   (loop for transaction in (reverse (transactions (current-organization frame)))
-        do (display-oneline-transaction-summary pane transaction)))
+        do (display-oneline-transaction-summary pane transaction nil)))
 
 (defun compta ()
   (run-frame-top-level (make-application-frame 'compta)))
