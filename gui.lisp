@@ -144,15 +144,16 @@
         (accounts (current-organization *application-frame*))))
 
 (define-compta-command (com-write-organization :name t) ((filename 'string))
-  (write-model filename (current-organization *application-frame*)))
+  (write-model filename *compta-current-version-name*
+	       (current-organization *application-frame*)))
 
 (define-compta-command (com-read-organization :name t) ((filename 'pathname))
   (setf (current-organization *application-frame*)
-        (read-model filename)))
+        (read-model filename *compta-allowed-version-names*)))
 
 (define-compta-command (com-read-organization-default :name t) ()
   (setf (current-organization *application-frame*)
-        (read-model "home")))
+        (read-model "home" *compta-allowed-version-names*)))
 
 (define-compta-command (com-new-transaction :name t) ()
   (let ((transaction (make-instance 'transaction :name "unnamed")))

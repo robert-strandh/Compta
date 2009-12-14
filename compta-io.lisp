@@ -21,3 +21,5 @@
   (:name name) (:date date) (:creator creator)
   (:debits debits) (:credits credits))
 
+(defparameter *compta-allowed-version-names* '("ComptaV1"))
+(defparameter *compta-current-version-name*  '("ComptaV1"))
