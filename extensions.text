@@ -166,6 +166,13 @@ les différents comptes (alimentation, abonnements...).
 
 Ajouter la planification de transaction automatique : les factures et
 les salaires mensuels par exemple.
+
+                             --*--
+
+Implémenter la sauvegarde automatique et la création de versions de
+sauvegarde. S'inspirer de ce que fait Emacs en lisant les paragraphes
+"backup" et "auto-save file" de son manuel. Permettre que cela soit
+facilement paramétrable par ajout de code.
  
 %%% Local Variables: 
 %%% mode: text
