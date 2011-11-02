@@ -20,8 +20,6 @@
 (defgeneric save-info (object)
   (:method-combination append :most-specific-last))
 
-(defclass model-object () ())
-
 ;;; should really use *print-readably*
 (defparameter *print-for-file-io* nil)
 
