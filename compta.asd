@@ -1,6 +1,6 @@
-(in-package #:cl-user)
+(in-package #:asdf-user)
 
-(asdf:defsystem :compta
+(defsystem :compta
   :depends-on (:mcclim)
   :components
   ((:file "packages" :depends-on ())
