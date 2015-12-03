@@ -3,8 +3,8 @@
 (defsystem :compta
   :depends-on (:mcclim)
   :components
-  ((:file "packages" :depends-on ())
-   (:file "io" :depends-on ("packages"))
-   (:file "model" :depends-on ("packages"))
-   (:file "compta-io" :depends-on ("packages" "model" "io"))
-   (:file "gui" :depends-on ("packages" "model"))))
+  ((:file "packages")
+   (:file "io")
+   (:file "model")
+   (:file "compta-io")
+   (:file "gui")))
