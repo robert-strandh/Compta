@@ -1,3 +1,5 @@
+(cl:in-package #:common-lisp-user)
+
 (defpackage #:compta-model
     (:use #:common-lisp)
   (:export #:organization
@@ -28,4 +30,3 @@
 (defpackage #:compta-gui
     (:use #:clim-lisp #:clim #:compta-model #:io #:compta-io)
   (:export #:compta))
-
