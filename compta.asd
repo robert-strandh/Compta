@@ -1,4 +1,4 @@
-(in-package #:asdf-user)
+(cl:in-package #:asdf-user)
 
 (defsystem :compta
   :depends-on (:mcclim)
