@@ -1,4 +1,4 @@
-(in-package #:compta-model)
+(cl:in-package #:compta-model)
 
 (defclass name-mixin ()
   ((%name :initarg :name :accessor name)))
