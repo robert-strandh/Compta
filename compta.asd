@@ -2,6 +2,7 @@
 
 (defsystem :compta
   :depends-on (:mcclim)
+  :serial t
   :components
   ((:file "packages")
    (:file "io")
