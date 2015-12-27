@@ -2,15 +2,15 @@ ComptaV1
 
 [COMPTA-MODEL:ORGANIZATION
    :NAME "Home"
-   :ACCOUNTS (#1=[COMPTA-MODEL:ACCOUNT :NAME "TVA" ]
-              #2=[COMPTA-MODEL:ACCOUNT :NAME "SFR" ]
+   :ACCOUNTS (#1=[COMPTA-MODEL:ACCOUNT :NAME "Sales tax" ]
+              #2=[COMPTA-MODEL:ACCOUNT :NAME "Telefonica" ]
               #3=[COMPTA-MODEL:ACCOUNT :NAME "Orange" ]
               #4=[COMPTA-MODEL:ACCOUNT :NAME "Telecommunications" ]
-              #5=[COMPTA-MODEL:ACCOUNT :NAME "Salaire Universite" ]
-              #6=[COMPTA-MODEL:ACCOUNT :NAME "Salaire IBM" ]
-              #7=[COMPTA-MODEL:ACCOUNT :NAME "Compte courant BNP" ])
+              #5=[COMPTA-MODEL:ACCOUNT :NAME "Salary Cablefix" ]
+              #6=[COMPTA-MODEL:ACCOUNT :NAME "Salary Exasoft" ]
+              #7=[COMPTA-MODEL:ACCOUNT :NAME "Bank account" ])
    :TRANSACTIONS ([COMPTA-MODEL:TRANSACTION
-                     :NAME "Facture Orange Payee"
+                     :NAME "Bill Orange Paid"
                      :DATE [COMPTA-MODEL:DATE
                               :YEAR 2009
                               :MONTH 11
@@ -23,7 +23,7 @@ ComptaV1
                                   :ACCOUNT #7#
                                   :AMOUNT 3967 ]) ]
                   [COMPTA-MODEL:TRANSACTION
-                     :NAME "Salaire Jill"
+                     :NAME "Salary Jill"
                      :DATE [COMPTA-MODEL:DATE
                               :YEAR 2009
                               :MONTH 11
@@ -38,7 +38,7 @@ ComptaV1
                                   :ACCOUNT #6#
                                   :AMOUNT 345678 ]) ]
                   [COMPTA-MODEL:TRANSACTION
-                     :NAME "Facture SFR Payee"
+                     :NAME "Bill Telefonica Paid"
                      :DATE [COMPTA-MODEL:DATE
                               :YEAR 2009
                               :MONTH 11
@@ -51,7 +51,7 @@ ComptaV1
                                   :ACCOUNT #7#
                                   :AMOUNT 9714 ]) ]
                   [COMPTA-MODEL:TRANSACTION
-                     :NAME "Facture SFR"
+                     :NAME "Bill Telefonica"
                      :DATE [COMPTA-MODEL:DATE
                               :YEAR 2009
                               :MONTH 11
@@ -65,7 +65,7 @@ ComptaV1
                                   :ACCOUNT #2#
                                   :AMOUNT 9714 ]) ]
                   [COMPTA-MODEL:TRANSACTION
-                     :NAME "Facture Orange"
+                     :NAME "Bill Orange"
                      :DATE [COMPTA-MODEL:DATE
                               :YEAR 2009
                               :MONTH 11
@@ -79,7 +79,7 @@ ComptaV1
                                   :ACCOUNT #3#
                                   :AMOUNT 3967 ]) ]
                   [COMPTA-MODEL:TRANSACTION
-                     :NAME "Salaire Jaques"
+                     :NAME "Salary Joe"
                      :DATE [COMPTA-MODEL:DATE
                               :YEAR 2009
                               :MONTH 11
