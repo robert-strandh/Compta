@@ -206,4 +206,3 @@
     ((changer 'name-changer :gesture :select))
   (setf (name (object changer))
         (accept 'string)))
-
