@@ -32,11 +32,11 @@
   ((%transaction :initarg :transaction :reader transaction)))
 
 (defun display-oneline-transaction-summary (pane transaction modifiablep)
-  (format pane "~a " (iso-date-string (date transaction)))  
+  (format pane "~a " (iso-date-string (date transaction)))
   (let ((object (if modifiablep
 		    (make-instance 'name-changer :object transaction)
 		    transaction))
-	(type (if modifiablep 'name-changer 'transaction))) 
+	(type (if modifiablep 'name-changer 'transaction)))
     (with-output-as-presentation (pane object type)
       (format pane "~a~%"
 	      (name transaction)))))
@@ -70,9 +70,9 @@
 
 (defmethod display-main-with-view (frame pane (view account-view))
   (declare (ignore frame))
-  (let ((account (account view)))  
+  (let ((account (account view)))
     (display-oneline-account-summary pane account)
-    (format pane "~%")    
+    (format pane "~%")
     (loop for transaction in (reverse (transactions (current-organization *application-frame*)))
 	  do (display-entry
 		     pane
@@ -113,7 +113,7 @@
 (defmethod display-main-with-view (frame pane (view transaction-view))
   (declare (ignore frame))
   (let ((transaction (transaction view)))
-    (display-oneline-transaction-summary pane transaction t)    
+    (display-oneline-transaction-summary pane transaction t)
     (format pane "Created by: ~a~%~%~%" (creator transaction))
     (display-entry-adder pane "Debits"
 			 (lambda (entry) (push entry (debits transaction))) (debits transaction))
@@ -197,7 +197,7 @@
 
 (define-compta-command (com-add-entry :name t)
     ((adder 'entry-adder :gesture :select))
-  (funcall (adder adder) 
+  (funcall (adder adder)
            (make-instance 'entry
                           :account (accept 'account)
                           :amount (accept 'amount))))
