@@ -73,7 +73,9 @@
   (let ((account (account view)))
     (display-oneline-account-summary pane account)
     (format pane "~%")
-    (loop for transaction in (reverse (transactions (current-organization clim:*application-frame*)))
+    (loop with frame = clim:*application-frame*
+          with organization = (current-organization frame)
+          for transaction in (reverse (transactions organization))
           do (display-entry
                      pane
                      transaction
