@@ -118,9 +118,11 @@
     (display-oneline-transaction-summary pane transaction t)
     (format pane "Created by: ~a~%~%~%" (creator transaction))
     (display-entry-adder pane "Debits"
-                         (lambda (entry) (push entry (debits transaction))) (debits transaction))
+                         (lambda (entry) (push entry (debits transaction)))
+                         (debits transaction))
     (display-entry-adder pane "Credits"
-                         (lambda (entry) (push entry (credits transaction))) (credits transaction))))
+                         (lambda (entry) (push entry (credits transaction)))
+                         (credits transaction))))
 
 (defun display-main (frame pane)
   (display-main-with-view frame pane (clim:stream-default-view pane)))
@@ -158,9 +160,12 @@
         (read-model "home" *compta-allowed-version-names*)))
 
 (define-compta-command (com-new-transaction :name t) ()
-  (let ((transaction (make-instance 'transaction :name "unnamed")))
-    (push transaction (transactions (current-organization clim:*application-frame*)))
-    (setf (clim:stream-default-view (clim:find-pane-named clim:*application-frame* 'main))
+  (let* ((transaction (make-instance 'transaction :name "unnamed"))
+         (frame clim:*application-frame*)
+         (organization (current-organization frame))
+         (main-pane (clim:find-pane-named frame 'main)))
+    (push transaction (transactions organization))
+    (setf (clim:stream-default-view main-pane)
           (make-instance 'transaction-view :transaction transaction))))
 
 (define-compta-command (com-change-current-transaction-name :name t)
