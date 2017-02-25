@@ -1,6 +1,6 @@
 (in-package #:compta-gui)
 
-(define-application-frame compta ()
+(clim:define-application-frame compta ()
   ((%current-organization :initform (make-instance 'organization :name "Home")
                           :accessor current-organization))
   (:panes (main :application
@@ -19,16 +19,16 @@
                  :width 500
                  :height 100))
   (:layouts (default
-                (horizontally
+                (clim:horizontally
                     ()
-                  (vertically () main inter)
+                  (clim:vertically () main inter)
                   transactions
                   accounts))))
 
-(defclass account-view (view)
+(defclass account-view (clim:view)
   ((%account :initarg :account :reader account)))
 
-(defclass transaction-view (view)
+(defclass transaction-view (clim:view)
   ((%transaction :initarg :transaction :reader transaction)))
 
 (defun display-oneline-transaction-summary (pane transaction modifiablep)
@@ -37,12 +37,12 @@
                     (make-instance 'name-changer :object transaction)
                     transaction))
         (type (if modifiablep 'name-changer 'transaction)))
-    (with-output-as-presentation (pane object type)
+    (clim:with-output-as-presentation (pane object type)
       (format pane "~a~%"
               (name transaction)))))
 
 (defun display-oneline-account-summary (pane account)
-  (with-output-as-presentation (pane account 'account)
+  (clim:with-output-as-presentation (pane account 'account)
     (format pane "~a~%" (name account))))
 
 (defgeneric display-main-with-view (frame pane view))
@@ -58,12 +58,12 @@
     (format pane format euros cents)))
 
 (defun display-entry (pane transaction entry amount-format)
-  (let ((medium (sheet-medium pane)))
+  (let ((medium (clim:sheet-medium pane)))
     (unless (null entry)
-      (with-output-as-presentation
+      (clim:with-output-as-presentation
           (pane transaction 'transaction)
         (format pane "~a" (iso-date-string (date transaction)))
-        (with-text-family
+        (clim:with-text-family
             (medium :fixed)
           (format-amount pane (amount entry) amount-format))
         (format pane "~a~%" (name transaction))))))
@@ -73,7 +73,7 @@
   (let ((account (account view)))
     (display-oneline-account-summary pane account)
     (format pane "~%")
-    (loop for transaction in (reverse (transactions (current-organization *application-frame*)))
+    (loop for transaction in (reverse (transactions (current-organization clim:*application-frame*)))
           do (display-entry
                      pane
                      transaction
@@ -85,7 +85,7 @@
                      (find account (credits transaction) :key #'account)
                      "~30d.~2,'0d~50t"))))
 
-(define-presentation-type amount () :inherit-from 'integer)
+(clim:define-presentation-type amount () :inherit-from 'integer)
 
 (defclass entry-adder ()
   ((%adder :initarg :adder :reader adder)))
@@ -94,18 +94,18 @@
   ((%object :initarg :object :reader object)))
 
 (defun display-entry-adder (pane area-name push-entry entries)
-  (let ((medium (sheet-medium pane)))
+  (let ((medium (clim:sheet-medium pane)))
     (flet ((show-entry (entry)
-             (with-text-family
+             (clim:with-text-family
                  (medium :fixed)
-               (with-output-as-presentation (pane (amount entry) 'amount)
+               (clim:with-output-as-presentation (pane (amount entry) 'amount)
                  (format-amount pane (amount entry) "~10d.~2,'0d        ")))
-             (with-output-as-presentation (pane (account entry) 'account)
+             (clim:with-output-as-presentation (pane (account entry) 'account)
                (format pane "~a~%" (name (account entry))))))
       (format pane "~a: " area-name)
       (let ((adder (make-instance 'entry-adder
                                   :adder push-entry)))
-        (with-output-as-presentation (pane adder 'entry-adder)
+        (clim:with-output-as-presentation (pane adder 'entry-adder)
           (format pane "[add]~%")))
       (loop for entry in (reverse entries)
             do (show-entry entry)))))
@@ -121,7 +121,7 @@
                          (lambda (entry) (push entry (credits transaction))) (credits transaction))))
 
 (defun display-main (frame pane)
-  (display-main-with-view frame pane (stream-default-view pane)))
+  (display-main-with-view frame pane (clim:stream-default-view pane)))
 
 (defun display-accounts (frame pane)
   (format pane "Accounts~%~%")
@@ -137,62 +137,62 @@
   (run-frame-top-level (make-application-frame 'compta)))
 
 (define-compta-command (com-quit :name t) ()
-  (frame-exit *application-frame*))
+  (frame-exit clim:*application-frame*))
 
 (define-compta-command (com-new-account :name t) ((name 'string))
   (push (make-instance 'account :name name)
-        (accounts (current-organization *application-frame*))))
+        (accounts (current-organization clim:*application-frame*))))
 
 (define-compta-command (com-write-organization :name t) ((filename 'string))
   (write-model filename *compta-current-version-name*
-               (current-organization *application-frame*)))
+               (current-organization clim:*application-frame*)))
 
 (define-compta-command (com-read-organization :name t) ((filename 'pathname))
-  (setf (current-organization *application-frame*)
+  (setf (current-organization clim:*application-frame*)
         (read-model filename *compta-allowed-version-names*)))
 
 (define-compta-command (com-read-organization-default :name t) ()
-  (setf (current-organization *application-frame*)
+  (setf (current-organization clim:*application-frame*)
         (read-model "home" *compta-allowed-version-names*)))
 
 (define-compta-command (com-new-transaction :name t) ()
   (let ((transaction (make-instance 'transaction :name "unnamed")))
-    (push transaction (transactions (current-organization *application-frame*)))
-    (setf (stream-default-view (find-pane-named *application-frame* 'main))
+    (push transaction (transactions (current-organization clim:*application-frame*)))
+    (setf (clim:stream-default-view (find-pane-named clim:*application-frame* 'main))
           (make-instance 'transaction-view :transaction transaction))))
 
 (define-compta-command (com-change-current-transaction-name :name t)
     ((name 'string))
-  (let ((view (stream-default-view (find-pane-named *application-frame* 'main))))
+  (let ((view (clim:stream-default-view (find-pane-named clim:*application-frame* 'main))))
     (setf (name (transaction view)) name)))
 
 (define-compta-command (com-edit-account :name t)
     ((account 'account :gesture :select))
-  (setf (stream-default-view (find-pane-named *application-frame* 'main))
+  (setf (clim:stream-default-view (find-pane-named clim:*application-frame* 'main))
         (make-instance 'account-view :account account)))
 
 (define-compta-command (com-edit-transaction :name t)
     ((transaction 'transaction :gesture :select))
-  (setf (stream-default-view (find-pane-named *application-frame* 'main))
+  (setf (clim:stream-default-view (find-pane-named clim:*application-frame* 'main))
         (make-instance 'transaction-view :transaction transaction)))
 
 (define-compta-command (com-delete-account :name t)
     ((account 'account :gesture :delete))
-  (let ((organization (current-organization *application-frame*)))
+  (let ((organization (current-organization clim:*application-frame*)))
     (setf (accounts organization)
           (remove account (accounts organization)))))
 
 (define-compta-command (com-delete-transaction :name t) ((transaction 'transaction))
-  (let ((organization (current-organization *application-frame*)))
+  (let ((organization (current-organization clim:*application-frame*)))
     (setf (transactions organization)
           (remove transaction (transactions organization)))))
 
 (define-presentation-method present (object (type account)
-                                            stream (view textual-view) &key)
+                                            stream (view clim:textual-view) &key)
   (format stream "~a" (name object)))
 
 (define-presentation-method present (object (type transaction)
-                                            stream (view textual-view) &key)
+                                            stream (view clim:textual-view) &key)
   (format stream "~a" (name object)))
 
 (define-compta-command (com-add-entry :name t)
