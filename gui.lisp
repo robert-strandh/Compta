@@ -145,7 +145,7 @@
 
 (define-compta-command (com-new-account :name t) ((name 'string))
   (push (make-instance 'compta-model:account :name name)
-        (compta-io:accounts (current-organization clim:*application-frame*))))
+        (compta-model:accounts (current-organization clim:*application-frame*))))
 
 (define-compta-command (com-write-organization :name t) ((filename 'string))
   (io:write-model filename compta-io:*compta-current-version-name*
