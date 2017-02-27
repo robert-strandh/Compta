@@ -23,7 +23,7 @@
            #:write-model))
 
 (defpackage #:compta-io
-  (:use #:common-lisp #:compta-model #:io)
+  (:use #:common-lisp)
   (:export #:*compta-allowed-version-names*
 	   #:*compta-current-version-name*))
 
