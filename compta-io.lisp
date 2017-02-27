@@ -4,22 +4,31 @@
 ;;;
 ;;; Save information for various model classes
 
-(define-save-info organization
-  (:name name) (:accounts accounts) (:transactions transactions))
+(io:define-save-info compta-model:organization
+  (:name compta-model:name)
+  (:accounts compta-model:accounts)
+  (:transactions compta-model:transactions))
 
-(define-save-info date
-  (:year year) (:month month) (:day day)
-  (:hour hour) (:minute minute))
+(io:define-save-info compta-model:date
+  (:year compta-model:year)
+  (:month compta-model:month)
+  (:day compta-model:day)
+  (:hour compta-model:hour)
+  (:minute compta-model:minute))
 
-(define-save-info account
-  (:name name))
+(io:define-save-info compta-model:account
+  (:name compta-model:name))
 
-(define-save-info entry
-  (:account account) (:amount amount))
+(io:define-save-info compta-model:entry
+  (:account compta-model:account)
+  (:amount compta-model:amount))
 
-(define-save-info transaction
-  (:name name) (:date date) (:creator creator)
-  (:debits debits) (:credits credits))
+(io:define-save-info compta-model:transaction
+  (:name compta-model:name)
+  (:date compta-model:date)
+  (:creator compta-model:creator)
+  (:debits compta-model:debits)
+  (:credits compta-model:credits))
 
 (defparameter *compta-allowed-version-names* '("ComptaV1"))
 (defparameter *compta-current-version-name*  '("ComptaV1"))
