@@ -28,5 +28,5 @@
 	   #:*compta-current-version-name*))
 
 (defpackage #:compta-gui
-  (:use #:clim-lisp #:compta-model #:io #:compta-io)
+  (:use #:common-lisp)
   (:export #:compta))
