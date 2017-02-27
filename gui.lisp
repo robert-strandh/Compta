@@ -1,7 +1,7 @@
 (in-package #:compta-gui)
 
 (clim:define-application-frame compta ()
-  ((%current-organization :initform (make-instance 'organization :name "Home")
+  ((%current-organization :initform (make-instance 'compta-model:organization :name "Home")
                           :accessor current-organization))
   (:panes (main :application
                 :width 800
@@ -32,18 +32,18 @@
   ((%transaction :initarg :transaction :reader transaction)))
 
 (defun display-oneline-transaction-summary (pane transaction modifiablep)
-  (format pane "~a " (iso-date-string (date transaction)))
+  (format pane "~a " (compta-model:iso-date-string (compta-model:date transaction)))
   (let ((object (if modifiablep
                     (make-instance 'name-changer :object transaction)
                     transaction))
-        (type (if modifiablep 'name-changer 'transaction)))
+        (type (if modifiablep 'name-changer 'compta-model:transaction)))
     (clim:with-output-as-presentation (pane object type)
       (format pane "~a~%"
-              (name transaction)))))
+              (compta-model:name transaction)))))
 
 (defun display-oneline-account-summary (pane account)
-  (clim:with-output-as-presentation (pane account 'account)
-    (format pane "~a~%" (name account))))
+  (clim:with-output-as-presentation (pane account 'compta-model:account)
+    (format pane "~a~%" (compta-model:name account))))
 
 (defgeneric display-main-with-view (frame pane view))
 
@@ -61,30 +61,30 @@
   (let ((medium (clim:sheet-medium pane)))
     (unless (null entry)
       (clim:with-output-as-presentation
-          (pane transaction 'transaction)
-        (format pane "~a" (iso-date-string (date transaction)))
+          (pane transaction 'compta-model:transaction)
+        (format pane "~a" (compta-model:iso-date-string (compta-model:date transaction)))
         (clim:with-text-family
             (medium :fixed)
-          (format-amount pane (amount entry) amount-format))
-        (format pane "~a~%" (name transaction))))))
+          (format-amount pane (compta-model:amount entry) amount-format))
+        (format pane "~a~%" (compta-model:name transaction))))))
 
 (defmethod display-main-with-view (frame pane (view account-view))
   (declare (ignore frame))
-  (let ((account (account view)))
+  (let ((account (compta-model:account view)))
     (display-oneline-account-summary pane account)
     (format pane "~%")
     (loop with frame = clim:*application-frame*
           with organization = (current-organization frame)
-          for transaction in (reverse (transactions organization))
+          for transaction in (reverse (compta-model:transactions organization))
           do (display-entry
                      pane
                      transaction
-                     (find account (debits transaction) :key #'account)
+                     (find account (compta-model:debits transaction) :key #'compta-model:account)
                      "~10d.~2,'0d~50t")
           do (display-entry
                      pane
                      transaction
-                     (find account (credits transaction) :key #'account)
+                     (find account (compta-model:credits transaction) :key #'compta-model:account)
                      "~30d.~2,'0d~50t"))))
 
 (clim:define-presentation-type amount () :inherit-from 'integer)
@@ -100,10 +100,10 @@
     (flet ((show-entry (entry)
              (clim:with-text-family
                  (medium :fixed)
-               (clim:with-output-as-presentation (pane (amount entry) 'amount)
-                 (format-amount pane (amount entry) "~10d.~2,'0d        ")))
-             (clim:with-output-as-presentation (pane (account entry) 'account)
-               (format pane "~a~%" (name (account entry))))))
+               (clim:with-output-as-presentation (pane (compta-model:amount entry) 'compta-model:amount)
+                 (format-amount pane (compta-model:amount entry) "~10d.~2,'0d        ")))
+             (clim:with-output-as-presentation (pane (compta-model:account entry) 'compta-model:account)
+               (format pane "~a~%" (compta-model:name (compta-model:account entry))))))
       (format pane "~a: " area-name)
       (let ((adder (make-instance 'entry-adder
                                   :adder push-entry)))
@@ -116,25 +116,25 @@
   (declare (ignore frame))
   (let ((transaction (transaction view)))
     (display-oneline-transaction-summary pane transaction t)
-    (format pane "Created by: ~a~%~%~%" (creator transaction))
+    (format pane "Created by: ~a~%~%~%" (compta-model:creator transaction))
     (display-entry-adder pane "Debits"
-                         (lambda (entry) (push entry (debits transaction)))
-                         (debits transaction))
+                         (lambda (entry) (push entry (compta-model:debits transaction)))
+                         (compta-model:debits transaction))
     (display-entry-adder pane "Credits"
-                         (lambda (entry) (push entry (credits transaction)))
-                         (credits transaction))))
+                         (lambda (entry) (push entry (compta-model:credits transaction)))
+                         (compta-model:credits transaction))))
 
 (defun display-main (frame pane)
   (display-main-with-view frame pane (clim:stream-default-view pane)))
 
 (defun display-accounts (frame pane)
   (format pane "Accounts~%~%")
-  (loop for account in (reverse (accounts (current-organization frame)))
+  (loop for account in (reverse (compta-model:accounts (current-organization frame)))
         do (display-oneline-account-summary pane account)))
 
 (defun display-transactions (frame pane)
   (format pane "Transactions~%~%")
-  (loop for transaction in (reverse (transactions (current-organization frame)))
+  (loop for transaction in (reverse (compta-model:transactions (current-organization frame)))
         do (display-oneline-transaction-summary pane transaction nil)))
 
 (defun compta ()
@@ -144,72 +144,72 @@
   (clim:frame-exit clim:*application-frame*))
 
 (define-compta-command (com-new-account :name t) ((name 'string))
-  (push (make-instance 'account :name name)
-        (accounts (current-organization clim:*application-frame*))))
+  (push (make-instance 'compta-model:account :name name)
+        (compta-io:accounts (current-organization clim:*application-frame*))))
 
 (define-compta-command (com-write-organization :name t) ((filename 'string))
-  (write-model filename *compta-current-version-name*
-               (current-organization clim:*application-frame*)))
+  (io:write-model filename compta-io:*compta-current-version-name*
+                  (current-organization clim:*application-frame*)))
 
 (define-compta-command (com-read-organization :name t) ((filename 'pathname))
   (setf (current-organization clim:*application-frame*)
-        (read-model filename *compta-allowed-version-names*)))
+        (io:read-model filename compta-io:*compta-allowed-version-names*)))
 
 (define-compta-command (com-read-organization-default :name t) ()
   (setf (current-organization clim:*application-frame*)
-        (read-model "home" *compta-allowed-version-names*)))
+        (io:read-model "home" compta-io:*compta-allowed-version-names*)))
 
 (define-compta-command (com-new-transaction :name t) ()
-  (let* ((transaction (make-instance 'transaction :name "unnamed"))
+  (let* ((transaction (make-instance 'compta-model:transaction :name "unnamed"))
          (frame clim:*application-frame*)
          (organization (current-organization frame))
          (main-pane (clim:find-pane-named frame 'main)))
-    (push transaction (transactions organization))
+    (push transaction (compta-model:transactions organization))
     (setf (clim:stream-default-view main-pane)
           (make-instance 'transaction-view :transaction transaction))))
 
 (define-compta-command (com-change-current-transaction-name :name t)
     ((name 'string))
   (let ((view (clim:stream-default-view (clim:find-pane-named clim:*application-frame* 'main))))
-    (setf (name (transaction view)) name)))
+    (setf (compta-model:name (transaction view)) name)))
 
 (define-compta-command (com-edit-account :name t)
-    ((account 'account :gesture :select))
+    ((account 'compta-model:account :gesture :select))
   (setf (clim:stream-default-view (clim:find-pane-named clim:*application-frame* 'main))
         (make-instance 'account-view :account account)))
 
 (define-compta-command (com-edit-transaction :name t)
-    ((transaction 'transaction :gesture :select))
+    ((transaction 'compta-model:transaction :gesture :select))
   (setf (clim:stream-default-view (clim:find-pane-named clim:*application-frame* 'main))
         (make-instance 'transaction-view :transaction transaction)))
 
 (define-compta-command (com-delete-account :name t)
-    ((account 'account :gesture :delete))
+    ((account 'compta-model:account :gesture :delete))
   (let ((organization (current-organization clim:*application-frame*)))
-    (setf (accounts organization)
-          (remove account (accounts organization)))))
+    (setf (compta-model:accounts organization)
+          (remove account (compta-model:accounts organization)))))
 
-(define-compta-command (com-delete-transaction :name t) ((transaction 'transaction))
+(define-compta-command (com-delete-transaction :name t) ((transaction 'compta-model:transaction))
   (let ((organization (current-organization clim:*application-frame*)))
-    (setf (transactions organization)
-          (remove transaction (transactions organization)))))
+    (setf (compta-model:transactions organization)
+          (remove transaction (compta-model:transactions organization)))))
 
 (clim:define-presentation-method clim:present
-    (object (type account) stream (view clim:textual-view) &key)
-  (format stream "~a" (name object)))
+    (object (type compta-model:account) stream (view clim:textual-view) &key)
+  (format stream "~a" (compta-model:name object)))
 
 (clim:define-presentation-method clim:present
-    (object (type transaction) stream (view clim:textual-view) &key)
-  (format stream "~a" (name object)))
+    (object (type compta-model:transaction) stream (view clim:textual-view) &key)
+  (format stream "~a" (compta-model:name object)))
 
 (define-compta-command (com-add-entry :name t)
     ((adder 'entry-adder :gesture :select))
   (funcall (adder adder)
-           (make-instance 'entry
-                          :account (clim:accept 'account)
-                          :amount (clim:accept 'amount))))
+           (make-instance 'compta-model:entry
+                          :account (clim:accept 'compta-model:account)
+                          :amount (clim:accept 'compta-model:amount))))
 
 (define-compta-command (com-change-name :name t)
     ((changer 'name-changer :gesture :select))
-  (setf (name (object changer))
+  (setf (compta-model:name (object changer))
         (clim:accept 'string)))
