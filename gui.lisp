@@ -70,7 +70,7 @@
 
 (defmethod display-main-with-view (frame pane (view account-view))
   (declare (ignore frame))
-  (let ((account (compta-model:account view)))
+  (let ((account (account view)))
     (display-oneline-account-summary pane account)
     (format pane "~%")
     (loop with frame = clim:*application-frame*
@@ -100,7 +100,7 @@
     (flet ((show-entry (entry)
              (clim:with-text-family
                  (medium :fixed)
-               (clim:with-output-as-presentation (pane (compta-model:amount entry) 'compta-model:amount)
+               (clim:with-output-as-presentation (pane (compta-model:amount entry) 'amount)
                  (format-amount pane (compta-model:amount entry) "~10d.~2,'0d        ")))
              (clim:with-output-as-presentation (pane (compta-model:account entry) 'compta-model:account)
                (format pane "~a~%" (compta-model:name (compta-model:account entry))))))
@@ -207,7 +207,7 @@
   (funcall (adder adder)
            (make-instance 'compta-model:entry
                           :account (clim:accept 'compta-model:account)
-                          :amount (clim:accept 'compta-model:amount))))
+                          :amount (clim:accept 'amount))))
 
 (define-compta-command (com-change-name :name t)
     ((changer 'name-changer :gesture :select))
