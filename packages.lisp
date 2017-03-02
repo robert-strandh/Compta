@@ -18,14 +18,14 @@
 (defpackage #:io
   (:use #:common-lisp)
   (:export #:*print-for-file-io*
-	   #:define-save-info
+           #:define-save-info
            #:read-model
            #:write-model))
 
 (defpackage #:compta-io
   (:use #:common-lisp)
   (:export #:*compta-allowed-version-names*
-	   #:*compta-current-version-name*))
+           #:*compta-current-version-name*))
 
 (defpackage #:compta-gui
   (:use #:common-lisp)
