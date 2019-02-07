@@ -67,7 +67,7 @@
         (format pane "~a"
                 (compta-model:iso-date-string (compta-model:date transaction)))
         (clim:with-text-family
-            (medium :fixed)
+            (medium :fix)
           (format-amount pane (compta-model:amount entry) amount-format))
         (format pane "~a~%" (compta-model:name transaction))))))
 
@@ -104,7 +104,7 @@
   (let ((medium (clim:sheet-medium pane)))
     (flet ((show-entry (entry)
              (clim:with-text-family
-                 (medium :fixed)
+                 (medium :fix)
                (clim:with-output-as-presentation
                    (pane (compta-model:amount entry) 'amount)
                  (format-amount pane
